@@ -1,8 +1,10 @@
 
 #include "urandom_writer.h"
+#include "disk_writer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Savkin: A=177;B=0x1E3A66B2;C=malloc;D=10;E=151;F=block;G=25;H=seq;I=99;J=sum;K=cv
 // Didenko: A=111;B=0x6FDC126E;C=malloc;D=113;E=126;F=block;G=71;H=seq;I=130;J=avg;K=cv
@@ -33,26 +35,61 @@ const size_t kWriteSize = 151 * kMegaByteSize;
 const size_t kBlockSize = 71;
 const size_t kReadThreadsCount = 99;
 
+// делаем остановку программы (для удобного захвата статистик)
+void pause(bool pause) {
+    if (!pause)
+        return;
+    printf("Press ENTER to continue...");
+    getchar();
 
-int main() {
+}
 
+int main(int argc, const char *argv[]) {
+    bool use_pause = false;
+    if (argc > 1 && !strcmp("--use-pause", argv[1]))
+        use_pause = true;
+
+    printf("Starting allocating...\n");
+    pause(use_pause);
     __auto_type allocated = (void *) malloc(kMallocSize);
     if (!allocated) {
-        printf("Couldn't allocate memory. Aborting.\n");
+        fprintf(stderr, "Couldn't allocate memory. Aborting.\n");
         goto aborting;
     }
+    printf("Successfully allocated %zu bytes at %lx\n", kMallocSize, (size_t) allocated);
+    pause(use_pause);
 
+    printf("Starting filling the memory...\n");
     __auto_type result = fill_memory(allocated, kMallocSize, kWriteThreadsCount);
     if (!result) {
-        printf("Couldn't fill the memory from /dev/urandom. Aborting.\n");
+        fprintf(stderr, "Couldn't fill the memory from /dev/urandom. Aborting.\n");
+        goto aborting;
+    }
+    printf("Successfully filled with %zu threads\n", kWriteThreadsCount);
+    pause(use_pause);
+
+    printf("Writing files on disk...\n");
+    __auto_type filenames = write_on_disk(allocated, kMallocSize, kBlockSize, kWriteSize);
+    if (!filenames.filenames) {
+        fprintf(stderr, "Couldn't write files on the disk, aborting.\n");
         goto aborting;
     }
 
+    pause(use_pause);
+
+    // TODO прочитать и агрегировать данные
+    delete_files_if_exist(&filenames);
+    free_filelist(&filenames);
+    printf("Deallocating the memory...\n");
     free(allocated);
+    printf("Successfully freed.\n");
+    pause(use_pause);
     return 0;
 
     aborting:
     {
+        delete_files_if_exist(&filenames);
+        free_filelist(&filenames);
         free(allocated);
         return 1;
     }
