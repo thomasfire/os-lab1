@@ -29,11 +29,13 @@ static void *fill_memory_p(void *data) {
         goto aborting;
     }
 
-    __auto_type read_sz = fread(params->begin_addr, sizeof(char), params->size, handler); // чтение из файла
-
-    if (read_sz != params->size) {
-        fprintf(stderr, "Error on reading %li bytes from /dev/urandom. Aborting\n", params->size);
-        goto aborting;
+    while (1) {
+        __auto_type read_sz = fread(params->begin_addr, sizeof(char), params->size, handler); // чтение из файла
+        if (read_sz != params->size) {
+            fprintf(stderr, "Error on reading %li bytes from /dev/urandom. Aborting\n", params->size);
+            goto aborting;
+        }
+        break;
     }
 
     fclose(handler); // закрытие файла

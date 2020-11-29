@@ -29,10 +29,10 @@
  * */
 
 const size_t kMegaByteSize = 1048576;
-const size_t kMallocSize = 17 * kMegaByteSize;
+const size_t kMallocSize = 177 * kMegaByteSize;
 //const size_t kInitAddress = 0x1E3A66B2;
 const size_t kWriteThreadsCount = 10;
-const size_t kWriteSize = 15 * kMegaByteSize;
+const size_t kWriteSize = 151 * kMegaByteSize;
 const size_t kBlockSize = 71;
 const size_t kReadThreadsCount = 99;
 
