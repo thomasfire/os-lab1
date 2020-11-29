@@ -1,6 +1,7 @@
 
 #include "urandom_writer.h"
 #include "disk_writer.h"
+#include "file_aggregator.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,10 +29,10 @@
  * */
 
 const size_t kMegaByteSize = 1048576;
-const size_t kMallocSize = 177 * kMegaByteSize;
+const size_t kMallocSize = 17 * kMegaByteSize;
 //const size_t kInitAddress = 0x1E3A66B2;
 const size_t kWriteThreadsCount = 10;
-const size_t kWriteSize = 151 * kMegaByteSize;
+const size_t kWriteSize = 15 * kMegaByteSize;
 const size_t kBlockSize = 71;
 const size_t kReadThreadsCount = 99;
 
@@ -77,7 +78,11 @@ int main(int argc, const char *argv[]) {
 
     pause(use_pause);
 
-    // TODO прочитать и агрегировать данные
+    printf("Reading the files...\n");
+    __auto_type aggreagated = aggregate_data(kReadThreadsCount, filenames);
+    printf("Sum of bytes (signed char count): %zi\n", aggreagated);
+    pause(use_pause);
+
     delete_files_if_exist(&filenames);
     free_filelist(&filenames);
     printf("Deallocating the memory...\n");

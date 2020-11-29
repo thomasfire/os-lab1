@@ -9,6 +9,8 @@ add_executable(oslab1
         urandom_writer.h
         disk_writer.c
         disk_writer.h
+        file_aggregator.c
+        file_aggregator.h
 )
 
 target_link_libraries(oslab1 pthread)

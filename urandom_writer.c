@@ -16,7 +16,7 @@ typedef struct {
 } write_threads_params_t;
 
 
-void *fill_memory_p(void *data) {
+static void *fill_memory_p(void *data) {
     if (!data) {
         fprintf(stderr, "Wrong args in `fill_memory_p`: address: 0x%lx. Aborting.\n", (u_int64_t) data);
         pthread_exit((void *) 1);
@@ -82,7 +82,7 @@ bool fill_memory(void *address, size_t sz, size_t threads_n) {
     for (size_t i = 0; i < threads_n; i++) {
         int32_t *result;
         if (pthread_join(threads[i], (void **) &result) || result) {
-            fprintf(stderr, "Couldn't create thread n: %zu", i);
+            fprintf(stderr, "Couldn't join thread n: %zu", i);
             goto aborting;
         }
     }

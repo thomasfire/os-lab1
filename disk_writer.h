@@ -10,6 +10,7 @@
 typedef struct {
     char **filenames;
     size_t count;
+    size_t sizes; // they are same for all entries
 } filelist;
 
 /// Returns list of files

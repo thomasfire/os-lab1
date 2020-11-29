@@ -24,6 +24,7 @@ filelist write_on_disk(const void *buffer, size_t total_sz, size_t block_sz, siz
     filelist filels;
     filels.filenames = (char **) calloc(sizeof(char *), files_n);
     filels.count = files_n;
+    filels.sizes = file_sz;
     if (!filels.filenames) {
         fprintf(stderr, "Error on calloc at creating list of filenames. Aborting\n");
         goto aborting;
